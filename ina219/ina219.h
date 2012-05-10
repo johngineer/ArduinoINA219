@@ -1,5 +1,18 @@
-// TI INA219 bus voltage and current sensor
-// MIT license
+/******************************************************************************
+* TI INA219 hi-side i2c current/power monitor Library
+*
+* http://www.ti.com/product/ina219
+*
+* 6 May 2012 by John De Cristofaro
+*
+*
+* Only tested at standard i2c 100kbps signaling rate
+*
+* This library does not handle triggered conversion modes. It uses the INA219
+* in continuous conversion mode. All reads are from continous conversions.
+*
+* MIT license
+******************************************************************************/
 
 #ifndef ina219_h
 #define ina219_h
@@ -7,7 +20,7 @@
 #include <WProgram.h>
 #include <Wire.h>
 
-//#define BMP085_DEBUG 0
+#define INA219_DEBUG 0
 
 // INA219 memory registers
 #define CONFIG_R		0x00	// configuration register

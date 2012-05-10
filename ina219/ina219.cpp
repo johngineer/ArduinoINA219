@@ -51,6 +51,7 @@ void INA219::calibrate(float shunt_val, float v_shunt_max, float v_bus_max, floa
   cal = (uint16_t)swap;
   power_lsb = current_lsb * 20;
 
+#if (INA219_DEBUG == 1)
   Serial.print("v_bus_max:	"); Serial.println(v_bus_max, 8);
   Serial.print("v_shunt_max:	"); Serial.println(v_shunt_max, 8);
   Serial.print("i_max_possible:	"); Serial.println(i_max_possible, 8);
@@ -62,15 +63,16 @@ void INA219::calibrate(float shunt_val, float v_shunt_max, float v_bus_max, floa
   Serial.println("  ");
   Serial.print("cal:		"); Serial.println(cal);
   Serial.print("r_shunt:	"); Serial.println(r_shunt);
+#endif
 
   write16(CAL_R, cal);
 
 }
 
 
-// config values (gain, bus adc, shunt adc, mode) can be derives from pp26-27 in the datasheet
+// config values (gain, bus adc, shunt adc, mode) can be derived from pp26-27 in the datasheet
 // defaults are:
-// gain = 3 (320mV range)
+// gain = 3 (unity gain - 320mV range)
 // bus adc = 3 (12-bit, single sample, 532uS conversion time)
 // shunt adc = 3 (12-bit, single sample, 532uS conversion time)
 // mode = 7 (continuous conversion)
@@ -85,7 +87,7 @@ void INA219::configure(uint8_t gain, uint8_t bus_adc, uint8_t shunt_adc, uint8_t
 
 void INA219::reset()
 {
-  write16(i2c_address, INA_RESET);
+  write16(CONFIG_R, INA_RESET);
   _delay_ms(5);
 }
 

@@ -14,5 +14,8 @@
 * Known bugs:
 *    * may return unreliable values if not connected to a bus.
 *
+* Dependencies:
+*    * Arduino Wire library
+* 
 * MIT license
 ******************************************************************************/

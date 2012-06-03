@@ -53,6 +53,7 @@
 
 // default values
 #define D_I2C_ADDRESS	0x40 // (64)
+#define D_RANGE			1
 #define D_GAIN			3
 #define D_SHUNT_ADC		3
 #define D_BUS_ADC		3
@@ -73,12 +74,12 @@ class INA219
 
 	void calibrate(float r_shunt = D_SHUNT, float v_shunt_max = D_V_SHUNT_MAX, float v_bus_max = D_V_BUS_MAX, float i_max_expected = D_I_MAX_EXPECTED);
 
-	void configure(uint8_t gain = D_GAIN, uint8_t bus_adc = D_BUS_ADC, uint8_t shunt_adc = D_SHUNT_ADC, uint8_t mode = D_MODE);
+	void configure(uint8_t range = D_RANGE, uint8_t gain = D_GAIN, uint8_t bus_adc = D_BUS_ADC, uint8_t shunt_adc = D_SHUNT_ADC, uint8_t mode = D_MODE);
 
 	void reset();
 
-	uint16_t shuntVoltageRaw();
-	uint16_t busVoltageRaw();
+	int16_t shuntVoltageRaw();
+	int16_t busVoltageRaw();
 	float shuntVoltage();
 	float busVoltage();
 	float shuntCurrent();
@@ -88,9 +89,9 @@ class INA219
   private:
 	uint8_t i2c_address;
 	float r_shunt, current_lsb, power_lsb;
-	uint16_t config, cal;
+	uint16_t config, cal, gain;
 
-	uint16_t read16(uint8_t addr);
+	int16_t read16(uint8_t addr);
 	void write16(uint8_t addr, uint16_t data);
 
 };

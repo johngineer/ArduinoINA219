@@ -25,6 +25,7 @@ void INA219::begin(uint8_t addr)
 {
   Wire.begin();
   i2c_address = addr;
+  gain = D_GAIN;
 }
 
 
@@ -72,30 +73,34 @@ void INA219::calibrate(float shunt_val, float v_shunt_max, float v_bus_max, floa
 
 // config values (gain, bus adc, shunt adc, mode) can be derived from pp26-27 in the datasheet
 // defaults are:
+// range = 1 (0-32V bus voltage range)
 // gain = 3 (unity gain - 320mV range)
 // bus adc = 3 (12-bit, single sample, 532uS conversion time)
 // shunt adc = 3 (12-bit, single sample, 532uS conversion time)
 // mode = 7 (continuous conversion)
-void INA219::configure(uint8_t gain, uint8_t bus_adc, uint8_t shunt_adc, uint8_t mode)
+void INA219::configure(uint8_t range, uint8_t gain, uint8_t bus_adc, uint8_t shunt_adc, uint8_t mode)
 {
   config = 0;
 
-  config |= (gain << PG0 | bus_adc << BADC1 | shunt_adc << SADC1 | mode);
+  config |= (range << BRNG | gain << PG0 | bus_adc << BADC1 | shunt_adc << SADC1 | mode);
 
   write16(CONFIG_R, config);		
 }
 
+// resets the INA219
 void INA219::reset()
 {
   write16(CONFIG_R, INA_RESET);
   _delay_ms(5);
 }
 
-uint16_t INA219::shuntVoltageRaw()
+// returns the raw binary value of the shunt voltage
+int16_t INA219::shuntVoltageRaw()
 {
   return read16(V_SHUNT_R);
 }
 
+// returns the shunt voltage in volts.
 float INA219::shuntVoltage()
 {
   float temp;
@@ -103,31 +108,37 @@ float INA219::shuntVoltage()
   return (temp / 100000);
 }
 
-uint16_t INA219::busVoltageRaw()
+// returns raw bus voltage binary value
+int16_t INA219::busVoltageRaw()
 {
   return read16(V_BUS_R);
 }
 
+// returns the bus voltage in volts
 float INA219::busVoltage()
 {
-  uint16_t temp;
+  int16_t temp;
   temp = read16(V_BUS_R);
   temp >>= 3;
   return (temp * 0.004);
 }
 
+// returns the shunt current in amps
 float INA219::shuntCurrent()
 {
   return (read16(I_SHUNT_R) * current_lsb);
 }
 
+// returns the bus power in watts
 float INA219::busPower()
 {
   return (read16(P_BUS_R) * power_lsb);
 }
 
 
-/*********************************************************************/
+/**********************************************************************
+* 			INTERNAL I2C FUNCTIONS			      *
+**********************************************************************/
 
 // writes a 16-bit word (d) to register pointer (a)
 // when selecting a register pointer to read from, (d) = 0
@@ -143,17 +154,17 @@ void INA219::write16(uint8_t a, uint16_t d) {
   delay(1);
 }
 
-uint16_t INA219::read16(uint8_t a) {
+
+int16_t INA219::read16(uint8_t a) {
   uint16_t ret;
 
   // move the pointer to reg. of interest, null argument
   write16(a, 0);
   
-//  Wire.beginTransmission(i2c_address); // start transmission to device 
-  Wire.requestFrom((int)i2c_address, 2);// send data n-bytes read
-  ret = Wire.receive(); // receive DATA
+  Wire.requestFrom((int)i2c_address, 2);	// request 2 data bytes
+  ret = Wire.receive(); // rx hi byte
   ret <<= 8;
-  ret |= Wire.receive(); // receive DATA
+  ret |= Wire.receive(); // rx lo byte
   Wire.endTransmission(); // end transmission
 
   return ret;

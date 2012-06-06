@@ -24,7 +24,9 @@
 *
 * Known bugs:
 *     * may return unreliable values if not connected to a bus or at
-*	bus currents below 1uA.
+*	bus currents below 10uA.
+*
+* Arduino 1.0 compatible as of 6/6/2012
 *
 * Dependencies:
 *    * Arduino Wire library

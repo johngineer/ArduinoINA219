@@ -34,7 +34,7 @@
 * MIT license
 ******************************************************************************/
 
-#include "INA219.H"
+#include "INA219.h"
 #include <util/delay.h>
 
 INA219::INA219() {

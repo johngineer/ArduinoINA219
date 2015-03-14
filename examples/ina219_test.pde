@@ -7,7 +7,7 @@
 
 
 #include <Wire.h>
-#include <ina219.h>
+#include <INA219.h>
 
 INA219 monitor;
 
